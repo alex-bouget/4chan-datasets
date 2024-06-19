@@ -20,3 +20,4 @@ with open(args.output, 'w') as outfile:
     for file in txt_files:
         with open(os.path.join(dir_path, file), 'r') as infile:
             outfile.write(infile.read())
+            outfile.write("\n--- NEW THREAD ---\n")

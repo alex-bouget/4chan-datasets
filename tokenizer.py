@@ -10,20 +10,36 @@ def format_data(input_file):
 
     raw_posts = content.split('---')
     formatted_data = []
+    parent = 0
+
     for post in raw_posts:
         post = post.strip()
         if post:
+            #reset parent if new thread
+            if post == "NEW THREAD":
+                parent = 0
+
+
             post_id_match = re.search(r'\d+', post)
+
+
             if post_id_match:
+
                 post_id = post_id_match.group()
                 post_text = post[len(post_id):].strip()
                 token_length = len(post_text.split())
+
                 formatted_data.append({
                     'id': len(formatted_data) + 1,
                     'author': post_id,
                     'text': post_text,
-                    'token_length': token_length
+                    'token_length': token_length,
+                    'parent': parent,
+
                 })
+
+                #set new parent if needed
+                parent = parent if parent else post_id
 
     return formatted_data
 
@@ -33,7 +49,7 @@ def save_data(tokenized_data, output_file, file_format='json'):
             json.dump(tokenized_data, json_file, indent=2)
     elif file_format == 'csv':
         with open(output_file, 'w') as csv_file:
-            fieldnames = ['id', 'author', 'text', 'token_length']
+            fieldnames = ['id', 'author', 'text', 'token_length', "parent"]
             writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
             writer.writeheader()
             for post in tokenized_data:
